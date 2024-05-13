@@ -20,12 +20,21 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 
 
-class Hubble(
-    private val env: String,
-    private val clientId: String,
-    private val clientSecret: String,
-    private val token: String
-) {
+object Hubble {
+    private lateinit var env: String
+    private lateinit var clientId: String
+    private lateinit var clientSecret: String
+    private lateinit var token: String
+
+    fun init(env: String,
+             clientId: String,
+             clientSecret: String,
+             token: String) {
+        this.env = env
+        this.clientId = clientId
+        this.clientSecret = clientSecret
+        this.token = token
+    }
 
     fun open(context: Context) {
         if (clientId.isEmpty() || clientSecret.isEmpty() || token.isEmpty()) {
