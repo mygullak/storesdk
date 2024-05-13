@@ -1,4 +1,4 @@
-package money.myhubble.store_sdk
+package money.myhubble.storesdk
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

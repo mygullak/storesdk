@@ -1,4 +1,4 @@
-package money.myhubble.store_sdk
+package money.myhubble.storesdk
 
 import org.junit.Test
 

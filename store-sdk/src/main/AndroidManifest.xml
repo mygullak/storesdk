@@ -10,7 +10,7 @@
     </queries>
     <application>
     <activity
-        android:name="money.myhubble.store_sdk.HubbleStore"
+        android:name="money.myhubble.storesdk.HubbleStore"
         android:exported="false"
         android:hardwareAccelerated="true"
         android:theme="@style/Theme.Design.NoActionBar" />

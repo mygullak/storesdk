@@ -1,4 +1,4 @@
-package money.myhubble.store_sdk
+package money.myhubble.storesdk
 
 import android.annotation.SuppressLint
 import android.content.Context

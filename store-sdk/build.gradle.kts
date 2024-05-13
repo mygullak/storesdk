@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "money.myhubble.store_sdk"
+    namespace = "money.myhubble.storesdk"
     compileSdk = 34
 
     defaultConfig {

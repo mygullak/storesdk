@@ -18,8 +18,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import money.mygullak.android_web.ui.theme.HubbleandroidwebTheme
-import money.myhubble.store_sdk.Hubble
-import money.myhubble.store_sdk.HubbleStore
+import money.myhubble.storesdk.Hubble
+
 
 class MainActivity : ComponentActivity() {
 
