@@ -103,7 +103,7 @@ class HubbleStore() : ComponentActivity() {
             settings.domStorageEnabled = true
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
-        webView.addJavascriptInterface(WebAppInterface(this), "HostComponent")
+        webView.addJavascriptInterface(WebAppInterface(this), "AndroidHost")
 
         webView.webViewClient = MyWebViewClient(this@HubbleStore, baseUrl)
         constraintLayout.addView(webView)
