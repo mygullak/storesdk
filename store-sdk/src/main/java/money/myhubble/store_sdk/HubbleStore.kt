@@ -3,10 +3,8 @@ package money.myhubble.store_sdk
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.webkit.JavascriptInterface
@@ -20,39 +18,43 @@ import android.widget.RelativeLayout
 import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import java.lang.Exception
-
-class HubbleStore (): ComponentActivity() {
-    private lateinit var clientId: String
-    private lateinit var  clientSecret: String
-    private lateinit var  authToken: String
-    private var isProdEnv = true
-    val baseUrl: String
-        get() = if (isProdEnv){
-            "vouchers.myhubble.money"
-        }else {
-            "vouchers.dev.myhubble.money"
-        }
 
 
-    fun initiate(context: Context, clientId: String, clientSecret: String, authToken: String, isProdEnv: Boolean){
+class Hubble(
+    private val env: String,
+    private val clientId: String,
+    private val clientSecret: String,
+    private val token: String
+) {
 
-        if(clientId.isEmpty() || clientSecret.isEmpty() || authToken.isEmpty()){
+    fun open(context: Context) {
+        if (clientId.isEmpty() || clientSecret.isEmpty() || token.isEmpty()) {
             return
         }
 
-        val intent = Intent(context, money.myhubble.store_sdk.HubbleStore::class.java).apply {
-            putExtra("clientId", clientId  )
+        val intent = Intent(context, HubbleStore::class.java).apply {
+            putExtra("clientId", clientId)
             putExtra("clientSecret", clientSecret)
-            putExtra("authToken", authToken)
-            putExtra("isProdEnv", isProdEnv)
+            putExtra("authToken", token)
+            putExtra("env", env)
         }
         context.startActivity(intent)
-
     }
 
+}
 
+class HubbleStore() : ComponentActivity() {
+    private lateinit var clientId: String
+    private lateinit var clientSecret: String
+    private lateinit var authToken: String
+    private var env = "prod"
 
+    val baseUrl: String
+        get() = if (env == "prod") {
+            "vouchers.myhubble.money"
+        } else {
+            "vouchers.dev.myhubble.money"
+        }
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
@@ -63,7 +65,7 @@ class HubbleStore (): ComponentActivity() {
         clientId = intent.getStringExtra("clientId") ?: ""
         clientSecret = intent.getStringExtra("clientSecret") ?: ""
         authToken = intent.getStringExtra("authToken") ?: ""
-        isProdEnv = intent.getBooleanExtra("isProdEnv", false)
+        env = intent.getStringExtra("env") ?: "prod"
 
         val constraintLayout = ConstraintLayout(this)
         constraintLayout.setBackgroundColor(Color.WHITE)
@@ -94,15 +96,15 @@ class HubbleStore (): ComponentActivity() {
         }
         webView.addJavascriptInterface(WebAppInterface(this), "HostComponent")
 
-        webView.webViewClient = MyWebViewClient(this@HubbleStore, webView, baseUrl)
+        webView.webViewClient = MyWebViewClient(this@HubbleStore, baseUrl)
         constraintLayout.addView(webView)
 
-        val url = "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
+        val url =
+            "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
         webView.loadUrl(url)
 
-
-
     }
+
     private fun setupProgressBar() {
         progressBar = ProgressBar(this)
         progressBar.id = View.generateViewId()
@@ -155,7 +157,14 @@ class HubbleStore (): ComponentActivity() {
 }
 
 
-private class MyWebViewClient(val activity: money.myhubble.store_sdk.HubbleStore, val webView: WebView, val baseUrl: String) : WebViewClient() {
+private class MyWebViewClient(
+    val activity: HubbleStore,
+    val baseUrl: String
+) : WebViewClient() {
+
+    override fun onPageFinished(view: WebView?, url: String?) {
+        activity.showWebView()
+    }
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         val url = request?.url
@@ -168,20 +177,15 @@ private class MyWebViewClient(val activity: money.myhubble.store_sdk.HubbleStore
         try {
             val intent = Intent(Intent.ACTION_VIEW, url)
             activity.startActivity(intent)
-        } catch (err: Exception){
+        } catch (err: Exception) {
             return false;
         }
         return true
     }
 
-
 }
-class WebAppInterface(private  val activity: HubbleStore){
-    @JavascriptInterface
-    fun onReady() {
-        activity.showWebView()
-    }
 
+class WebAppInterface(private val activity: HubbleStore) {
     @JavascriptInterface
     fun close() {
         activity.finish()
