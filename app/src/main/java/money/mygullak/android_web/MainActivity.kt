@@ -30,20 +30,14 @@ import android.view.KeyEvent
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var fragment: WebViewFragment
-    private val fragmentTag = "hubble_webview_fragment"
 
-
+    // this must be there in your activity if you want 
+    // to launch the Hubble webview in a fragment
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val fragment = supportFragmentManager.findFragmentByTag(fragmentTag) as WebViewFragment
-            if (fragment.isVisible) {
-                if (fragment.webView.canGoBack()) {
-                    fragment.webView.goBack()
-                } else {
-                    supportFragmentManager.beginTransaction().hide(fragment).commit()
-                }
-                return  true;
+            val hubbleBackCompleted = Hubble.onBackPressed(supportFragmentManager)
+            if (hubbleBackCompleted) {
+                return true
             }
         }
         return super.onKeyDown(keyCode, event);
@@ -75,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
+    // This function will open the Hubble webview in a fragment
     fun HubbleFragmentButton() {
         val context = LocalContext.current
         Box(
@@ -87,9 +82,9 @@ class MainActivity : AppCompatActivity() {
                         clientSecret = "sCOZ07mzht",
                         token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                     )
-                    fragment = Hubble.getFragment()
+                    Hubble.initialiseFragment()
                     (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                        .replace(android.R.id.content, fragment, fragmentTag)
+                        .replace(android.R.id.content, Hubble.fragment, Hubble.fragmentTag)
                         .commit()
                 },
                 modifier = Modifier
@@ -101,8 +96,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    
+
     @Composable
+    // This function will open the Hubble webview in an activity
     fun HubbleActivityButton() {
         val context = LocalContext.current
         Box(
@@ -116,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                         token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                     )
 
-                    Hubble.open(context)
+                    Hubble.launchActivity(context)
                 },
 
                 modifier = Modifier

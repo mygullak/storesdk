@@ -30,6 +30,10 @@ object Hubble {
     private lateinit var clientSecret: String
     private lateinit var token: String
 
+    lateinit var fragment: WebViewFragment
+     val fragmentTag = "hubble_webview_fragment"
+
+
     fun init(
         env: String,
         clientId: String,
@@ -42,7 +46,7 @@ object Hubble {
         this.token = token
     }
 
-    fun open(context: Context) {
+    fun launchActivity(context: Context) {
         if (clientId.isEmpty() || clientSecret.isEmpty() || token.isEmpty()) {
             return
         }
@@ -58,8 +62,8 @@ object Hubble {
 
 
     // function to get fragment
-    fun getFragment(): WebViewFragment {
-        val fragment = WebViewFragment().apply {
+    fun initialiseFragment() {
+        fragment = WebViewFragment().apply {
             arguments = Bundle().apply {
                 putString("clientId", clientId)
                 putString("clientSecret", clientSecret)
@@ -67,7 +71,19 @@ object Hubble {
                 putString("env", env)
             }
         }
-        return fragment
+    }
+
+    fun onBackPressed(supportFragmentManager : androidx.fragment.app.FragmentManager): Boolean {
+        val fragment = supportFragmentManager.findFragmentByTag(fragmentTag) as WebViewFragment
+            if (fragment.isVisible) {
+                if (fragment.webView.canGoBack()) {
+                    fragment.webView.goBack()
+                } else {
+                    supportFragmentManager.beginTransaction().hide(fragment).commit()
+                }
+                return  true;
+            }
+            return false;
     }
 
 }
