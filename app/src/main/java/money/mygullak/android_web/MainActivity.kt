@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         hubbleFragmentController.onWebEvent = { event, properties ->
-            println("Event is : $event")
+            println("Event from fragment is : $event")
             println("Properties: $properties")
         }
 
@@ -77,7 +77,11 @@ class MainActivity : AppCompatActivity() {
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
         )
 
-
+        // setting the onWebEvent for the HubbleActivity
+        hubbleActivityController.onWebEvent = { event, properties ->
+            println("Event from activity is : $event")
+            println("Properties: $properties")
+        }
 
         setContent {
             // HubbleandroidwebTheme {

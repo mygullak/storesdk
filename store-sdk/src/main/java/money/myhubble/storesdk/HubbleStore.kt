@@ -48,6 +48,8 @@ open class HubbleBase {
         // override this method to perform any action after init
     }
 
+    var onWebEvent: (event: String, properties: Map<String, String>?) -> Unit =
+    { event, properties -> {} }
 }
 
 class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager) :
@@ -56,8 +58,6 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
     lateinit var fragment: WebViewFragment
     val fragmentTag = "hubble_webview_fragment"
 
-    var onWebEvent: (event: String, properties: Map<String, String>?) -> Unit =
-        { event, properties -> {} }
 
     override fun onAfterInit() {
         // initialise the fragment
@@ -98,11 +98,15 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
 
 }
 
+private var hubbleActivityController: HubbleActivityController? = null
+
 class HubbleActivityController : HubbleBase() {
     fun launchActivity(context: Context) {
         if (clientId.isEmpty() || clientSecret.isEmpty() || token.isEmpty()) {
             return
         }
+
+        hubbleActivityController = this
 
         val intent = Intent(context, HubbleStoreActivity::class.java).apply {
             putExtra("clientId", clientId)
@@ -127,6 +131,8 @@ class HubbleStoreActivity : AppCompatActivity() {
             clientSecret = intent.getStringExtra("clientSecret") ?: "",
             token = intent.getStringExtra("authToken") ?: ""
         )
+
+        hubbleFragmentController.onWebEvent = hubbleActivityController?.onWebEvent ?: { event, properties -> {}}
 
         supportFragmentManager.beginTransaction()
             .replace(
