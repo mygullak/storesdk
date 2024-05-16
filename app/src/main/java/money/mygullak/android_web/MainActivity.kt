@@ -30,6 +30,11 @@ import android.view.KeyEvent
 
 
 class MainActivity : AppCompatActivity() {
+    // This example show the usage of HubbleFragmentController and HubbleActivityController
+    // to launch the Hubble webview in a fragment and an activity respectively
+
+    // Initialising both is not necessary, you can choose to use either of them
+    // as per your requirement
 
     private val hubbleFragmentController = HubbleFragmentController(supportFragmentManager)
     private val hubbleActivityController = HubbleActivityController()

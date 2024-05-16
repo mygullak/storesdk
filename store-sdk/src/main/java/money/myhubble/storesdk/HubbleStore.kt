@@ -30,9 +30,6 @@ open class HubbleBase {
     lateinit var clientSecret: String
     lateinit var token: String
 
-    lateinit var fragment: WebViewFragment
-    val fragmentTag = "hubble_webview_fragment"
-
 
     fun init(
         env: String,
@@ -56,6 +53,9 @@ open class HubbleBase {
 class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager) :
     HubbleBase() {
 
+    lateinit var fragment: WebViewFragment
+    val fragmentTag = "hubble_webview_fragment"
+    
     override fun onAfterInit() {
         // initialise the fragment
         fragment = WebViewFragment().apply {
