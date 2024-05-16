@@ -19,16 +19,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import money.mygullak.android_web.ui.theme.HubbleandroidwebTheme
 import money.myhubble.storesdk.Hubble
+import money.myhubble.storesdk.WebViewFragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
-
-
-
-
+import android.webkit.WebView
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var fragment: WebViewFragment
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,62 +53,62 @@ class MainActivity : AppCompatActivity() {
             // }
         }
     }
-}
-
-@Composable
-fun HubbleFragmentButton() {
-    val context = LocalContext.current
-    Box(
-    ) {
-        Button(
-            onClick = {
-                Hubble.init(
-                    env = "debug",
-                    clientId = "visit-health",
-                    clientSecret = "sCOZ07mzht",
-                    token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-                )
-                val fragment = Hubble.getFragment()
-                (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                    .replace(android.R.id.content, fragment)
-                    .commit()
-            },
-            modifier = Modifier
-                .width(130.dp)
-                .height(50.dp),
-            shape = RectangleShape
+    @Composable
+    fun HubbleFragmentButton() {
+        val context = LocalContext.current
+        Box(
         ) {
-            Text(text = "Open Fragment")
+            Button(
+                onClick = {
+                    Hubble.init(
+                        env = "debug",
+                        clientId = "visit-health",
+                        clientSecret = "sCOZ07mzht",
+                        token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+                    )
+                    fragment = Hubble.getFragment( )
+                    (context as AppCompatActivity).supportFragmentManager.beginTransaction()
+                        .replace(android.R.id.content, fragment)
+                        .commit()
+                },
+                modifier = Modifier
+                    .width(130.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = "Open Fragment")
+            }
         }
+    }
+    
+    @Composable
+    fun HubbleActivityButton() {
+        val context = LocalContext.current
+        Box(
+        ) {
+            Button(
+                onClick = {
+                    Hubble.init(
+                        env = "debug",
+                        clientId = "visit-health",
+                        clientSecret = "sCOZ07mzht",
+                        token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+                    )
+    
+                    Hubble.open(context) 
+                },
+    
+                modifier = Modifier
+                    .width(130.dp)
+                    .height(50.dp),
+                shape = RectangleShape
+            ) {
+                Text(text = "Open Activity")
+            }
+        }
+    
     }
 }
 
-@Composable
-fun HubbleActivityButton() {
-    val context = LocalContext.current
-    Box(
-    ) {
-        Button(
-            onClick = {
-                Hubble.init(
-                    env = "debug",
-                    clientId = "visit-health",
-                    clientSecret = "sCOZ07mzht",
-                    token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-                )
-
-                Hubble.open(context) 
-            },
-
-            modifier = Modifier
-                .width(130.dp)
-                .height(50.dp),
-            shape = RectangleShape
-        ) {
-            Text(text = "Open Activity")
-        }
-    }
-
-}
 
 

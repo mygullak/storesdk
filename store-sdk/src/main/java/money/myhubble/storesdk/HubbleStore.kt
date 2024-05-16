@@ -56,7 +56,7 @@ object Hubble {
 
 
     // function to get fragment
-    fun getFragment(): WebViewFragment {
+    fun getFragment(): WebViewFragment { 
         val fragment = WebViewFragment().apply {
             arguments = Bundle().apply {
                 putString("clientId", clientId)
@@ -71,10 +71,12 @@ object Hubble {
 }
 
 class HubbleStoreActivity : AppCompatActivity() {
+    private lateinit var fragment: WebViewFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val fragment = WebViewFragment().apply {
+         fragment = WebViewFragment().apply {
              arguments = Bundle().apply {
                 putString("clientId", intent.getStringExtra("clientId"))
                 putString("clientSecret", intent.getStringExtra("clientSecret"))
@@ -83,47 +85,27 @@ class HubbleStoreActivity : AppCompatActivity() {
             }
         }
 
-
         supportFragmentManager.beginTransaction()
             .replace(android.R.id.content, fragment)
             .commit()
     }
+
+        //Handles back button for web-view
+        override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+            if (keyCode == KeyEvent.KEYCODE_BACK && fragment.webView.canGoBack()) {
+                fragment.webView.goBack()
+                return true
+            }
+            return super.onKeyDown(keyCode, event)
+        }
 }
-
-
-// class HubbleStoreActivity() : ComponentActivity() {
-//     private lateinit var clientId: String
-//     private lateinit var clientSecret: String
-//     private lateinit var authToken: String
-//     private var env = "prod"
-
-//     //Handles back button for web-view
-//     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-//         if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-//             webView.goBack()
-//             return true
-//         }
-//         return super.onKeyDown(keyCode, event)
-//     }
-
-//     fun showWebView() {
-//         runOnUiThread {
-//             progressBar.visibility = View.INVISIBLE
-//             webView.visibility = View.VISIBLE
-//         }
-//     }
-
-// }
-
-
-
 
 class WebViewFragment : Fragment() {
     private lateinit var clientId: String
     private lateinit var clientSecret: String
     private lateinit var authToken: String
     private var env = "prod"
-    private lateinit var webView: WebView
+     lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
 
     val baseUrl: String
