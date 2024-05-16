@@ -18,9 +18,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import money.mygullak.android_web.ui.theme.HubbleandroidwebTheme
-import money.myhubble.storesdk.Hubble
 import money.myhubble.storesdk.WebViewFragment
 import androidx.appcompat.app.AppCompatActivity
+import money.myhubble.storesdk.HubbleFragmentController
+import money.myhubble.storesdk.HubbleActivityController
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
@@ -30,12 +31,15 @@ import android.view.KeyEvent
 
 class MainActivity : AppCompatActivity() {
 
+    private val hubbleFragmentController = HubbleFragmentController(supportFragmentManager)
+    private val hubbleActivityController = HubbleActivityController()
 
-    // this must be there in your activity if you want 
+
+    // this must be there in your activity if you want
     // to launch the Hubble webview in a fragment
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val hubbleBackCompleted = Hubble.onBackPressed(supportFragmentManager)
+            val hubbleBackCompleted = hubbleFragmentController.onBackPressed()
             if (hubbleBackCompleted) {
                 return true
             }
@@ -46,6 +50,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // initialising the HubbleFragment
+        hubbleFragmentController.init(
+            env = "debug",
+            clientId = "visit-health",
+            clientSecret = "sCOZ07mzht",
+            token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+        )
+
+        //initialising the HubbleActivity
+        hubbleActivityController.init(
+            env = "debug",
+            clientId = "visit-health",
+            clientSecret = "sCOZ07mzht",
+            token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+        )
+
+
+
         setContent {
             // HubbleandroidwebTheme {
             // A surface container using the 'background' color from the theme
@@ -76,15 +99,12 @@ class MainActivity : AppCompatActivity() {
         ) {
             Button(
                 onClick = {
-                    Hubble.init(
-                        env = "debug",
-                        clientId = "visit-health",
-                        clientSecret = "sCOZ07mzht",
-                        token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-                    )
-                    Hubble.initialiseFragment()
                     (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                        .replace(android.R.id.content, Hubble.fragment, Hubble.fragmentTag)
+                        .replace(
+                            android.R.id.content,
+                            hubbleFragmentController.fragment,
+                            hubbleFragmentController.fragmentTag
+                        )
                         .commit()
                 },
                 modifier = Modifier
@@ -105,14 +125,7 @@ class MainActivity : AppCompatActivity() {
         ) {
             Button(
                 onClick = {
-                    Hubble.init(
-                        env = "debug",
-                        clientId = "visit-health",
-                        clientSecret = "sCOZ07mzht",
-                        token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-                    )
-
-                    Hubble.launchActivity(context)
+                    hubbleActivityController.launchActivity(context)
                 },
 
                 modifier = Modifier
