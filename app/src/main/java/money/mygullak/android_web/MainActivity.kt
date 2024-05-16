@@ -25,21 +25,41 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
 import android.webkit.WebView
+import android.view.KeyEvent
+
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var fragment: WebViewFragment
+    private val fragmentTag = "hubble_webview_fragment"
+
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            val fragment = supportFragmentManager.findFragmentByTag(fragmentTag) as WebViewFragment
+            if (fragment.isVisible) {
+                if (fragment.webView.canGoBack()) {
+                    fragment.webView.goBack()
+                } else {
+                    supportFragmentManager.beginTransaction().hide(fragment).commit()
+                }
+                return  true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             // HubbleandroidwebTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Column(
+            // A surface container using the 'background' color from the theme
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -49,10 +69,11 @@ class MainActivity : AppCompatActivity() {
                     HubbleActivityButton()
                 }
 
-                }
+            }
             // }
         }
     }
+
     @Composable
     fun HubbleFragmentButton() {
         val context = LocalContext.current
@@ -66,9 +87,9 @@ class MainActivity : AppCompatActivity() {
                         clientSecret = "sCOZ07mzht",
                         token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                     )
-                    fragment = Hubble.getFragment( )
+                    fragment = Hubble.getFragment()
                     (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                        .replace(android.R.id.content, fragment)
+                        .replace(android.R.id.content, fragment, fragmentTag)
                         .commit()
                 },
                 modifier = Modifier
@@ -94,10 +115,10 @@ class MainActivity : AppCompatActivity() {
                         clientSecret = "sCOZ07mzht",
                         token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                     )
-    
-                    Hubble.open(context) 
+
+                    Hubble.open(context)
                 },
-    
+
                 modifier = Modifier
                     .width(130.dp)
                     .height(50.dp),
@@ -106,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 Text(text = "Open Activity")
             }
         }
-    
+
     }
 }
 

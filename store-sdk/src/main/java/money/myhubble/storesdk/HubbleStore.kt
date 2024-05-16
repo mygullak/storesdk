@@ -30,10 +30,12 @@ object Hubble {
     private lateinit var clientSecret: String
     private lateinit var token: String
 
-    fun init(env: String,
-             clientId: String,
-             clientSecret: String,
-             token: String) {
+    fun init(
+        env: String,
+        clientId: String,
+        clientSecret: String,
+        token: String
+    ) {
         this.env = env
         this.clientId = clientId
         this.clientSecret = clientSecret
@@ -56,7 +58,7 @@ object Hubble {
 
 
     // function to get fragment
-    fun getFragment(): WebViewFragment { 
+    fun getFragment(): WebViewFragment {
         val fragment = WebViewFragment().apply {
             arguments = Bundle().apply {
                 putString("clientId", clientId)
@@ -72,12 +74,13 @@ object Hubble {
 
 class HubbleStoreActivity : AppCompatActivity() {
     private lateinit var fragment: WebViewFragment
+    private val fragmentTag = "hubble_webview_fragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-         fragment = WebViewFragment().apply {
-             arguments = Bundle().apply {
+        fragment = WebViewFragment().apply {
+            arguments = Bundle().apply {
                 putString("clientId", intent.getStringExtra("clientId"))
                 putString("clientSecret", intent.getStringExtra("clientSecret"))
                 putString("authToken", intent.getStringExtra("authToken"))
@@ -86,18 +89,18 @@ class HubbleStoreActivity : AppCompatActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .replace(android.R.id.content, fragment)
+            .replace(android.R.id.content, fragment, fragmentTag)
             .commit()
     }
 
-        //Handles back button for web-view
-        override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-            if (keyCode == KeyEvent.KEYCODE_BACK && fragment.webView.canGoBack()) {
-                fragment.webView.goBack()
-                return true
-            }
-            return super.onKeyDown(keyCode, event)
+    //Handles back button for web-view
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && fragment.webView.canGoBack()) {
+            fragment.webView.goBack()
+            return true
         }
+        return super.onKeyDown(keyCode, event)
+    }
 }
 
 class WebViewFragment : Fragment() {
@@ -105,7 +108,7 @@ class WebViewFragment : Fragment() {
     private lateinit var clientSecret: String
     private lateinit var authToken: String
     private var env = "prod"
-     lateinit var webView: WebView
+    lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
 
     val baseUrl: String
@@ -140,7 +143,7 @@ class WebViewFragment : Fragment() {
         return constraintLayout
     }
 
-    fun getWebView(context: Context ): WebView {
+    fun getWebView(context: Context): WebView {
         val activity = requireActivity()
 
         val webView = WebView(context)
@@ -150,7 +153,7 @@ class WebViewFragment : Fragment() {
             LinearLayout.LayoutParams.MATCH_PARENT
         )
         webView.visibility = View.INVISIBLE
-    
+
         webView.apply {
             settings.javaScriptCanOpenWindowsAutomatically = true
             settings.javaScriptEnabled = true
@@ -160,15 +163,16 @@ class WebViewFragment : Fragment() {
         }
         webView.addJavascriptInterface(WebAppInterface(activity), "AndroidHost")
         webView.webViewClient = MyWebViewClient(activity, baseUrl, this)
-    
-        val url = "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
+
+        val url =
+            "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
         webView.loadUrl(url)
-    
+
         return webView
     }
-   
 
-    private fun setupProgressBar(context : Context) {
+
+    private fun setupProgressBar(context: Context) {
         progressBar = ProgressBar(context)
         progressBar.id = View.generateViewId()
         val progressBarParams = RelativeLayout.LayoutParams(
