@@ -19,32 +19,74 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import money.mygullak.android_web.ui.theme.HubbleandroidwebTheme
 import money.myhubble.storesdk.Hubble
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 
 
-class MainActivity : ComponentActivity() {
+
+
+
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            HubbleandroidwebTheme {
+            // HubbleandroidwebTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HubbleButton()
+                    Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    HubbleFragmentButton()
+                    Spacer(modifier = Modifier.height(16.dp)) // Add some space between the buttons
+                    HubbleActivityButton()
                 }
-            }
+
+                }
+            // }
         }
     }
 }
 
 @Composable
-fun HubbleButton() {
+fun HubbleFragmentButton() {
     val context = LocalContext.current
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    ) {
+        Button(
+            onClick = {
+                Hubble.init(
+                    env = "debug",
+                    clientId = "visit-health",
+                    clientSecret = "sCOZ07mzht",
+                    token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+                )
+                val fragment = Hubble.getFragment()
+                (context as AppCompatActivity).supportFragmentManager.beginTransaction()
+                    .replace(android.R.id.content, fragment)
+                    .commit()
+            },
+            modifier = Modifier
+                .width(130.dp)
+                .height(50.dp),
+            shape = RectangleShape
+        ) {
+            Text(text = "Open Fragment")
+        }
+    }
+}
+
+@Composable
+fun HubbleActivityButton() {
+    val context = LocalContext.current
+    Box(
     ) {
         Button(
             onClick = {
@@ -55,7 +97,7 @@ fun HubbleButton() {
                     token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                 )
 
-                Hubble.open(context)
+                Hubble.open(context) 
             },
 
             modifier = Modifier
@@ -63,7 +105,7 @@ fun HubbleButton() {
                 .height(50.dp),
             shape = RectangleShape
         ) {
-            Text(text = "Open Hubble")
+            Text(text = "Open Activity")
         }
     }
 

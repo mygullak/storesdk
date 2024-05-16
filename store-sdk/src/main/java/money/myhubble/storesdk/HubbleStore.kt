@@ -54,6 +54,20 @@ object Hubble {
         context.startActivity(intent)
     }
 
+
+    // function to get fragment
+    fun getFragment(): WebViewFragment {
+        val fragment = WebViewFragment().apply {
+            arguments = Bundle().apply {
+                putString("clientId", clientId)
+                putString("clientSecret", clientSecret)
+                putString("authToken", token)
+                putString("env", env)
+            }
+        }
+        return fragment
+    }
+
 }
 
 class HubbleStoreActivity : AppCompatActivity() {
