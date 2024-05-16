@@ -64,6 +64,11 @@ class MainActivity : AppCompatActivity() {
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
         )
 
+        hubbleFragmentController.onWebEvent = { event, properties ->
+            println("Event is : $event")
+            println("Properties: $properties")
+        }
+
         //initialising the HubbleActivity
         hubbleActivityController.init(
             env = "debug",

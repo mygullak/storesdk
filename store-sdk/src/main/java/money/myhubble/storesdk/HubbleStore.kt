@@ -55,10 +55,13 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
 
     lateinit var fragment: WebViewFragment
     val fragmentTag = "hubble_webview_fragment"
-    
+
+    var onWebEvent: (event: String, properties: Map<String, String>?) -> Unit =
+        { event, properties -> {} }
+
     override fun onAfterInit() {
         // initialise the fragment
-        fragment = WebViewFragment().apply {
+        fragment = WebViewFragment(this).apply {
             arguments = Bundle().apply {
                 putString("clientId", clientId)
                 putString("clientSecret", clientSecret)
@@ -126,7 +129,11 @@ class HubbleStoreActivity : AppCompatActivity() {
         )
 
         supportFragmentManager.beginTransaction()
-            .replace(android.R.id.content, hubbleFragmentController.fragment, hubbleFragmentController.fragmentTag)
+            .replace(
+                android.R.id.content,
+                hubbleFragmentController.fragment,
+                hubbleFragmentController.fragmentTag
+            )
             .commit()
     }
 
@@ -142,7 +149,7 @@ class HubbleStoreActivity : AppCompatActivity() {
     }
 }
 
-class WebViewFragment : Fragment() {
+class WebViewFragment(private val hubbleFragmentController: HubbleFragmentController) : Fragment() {
     private lateinit var clientId: String
     private lateinit var clientSecret: String
     private lateinit var authToken: String
@@ -200,7 +207,10 @@ class WebViewFragment : Fragment() {
             settings.domStorageEnabled = true
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
-        webView.addJavascriptInterface(WebAppInterface(activity), "AndroidHost")
+        webView.addJavascriptInterface(
+            WebAppInterface(activity, hubbleFragmentController),
+            "AndroidHost"
+        )
         webView.webViewClient = MyWebViewClient(activity, baseUrl, this)
 
         val url =
@@ -279,10 +289,18 @@ private class MyWebViewClient(
 
 }
 
-class WebAppInterface(private val activity: ComponentActivity) {
+class WebAppInterface(
+    private val activity: ComponentActivity,
+    private val hubbleFragmentController: HubbleFragmentController
+) {
     @JavascriptInterface
     fun close() {
         activity.finish()
+    }
+
+    @JavascriptInterface
+    fun onWebEvent(event: String, properties: Map<String, String>?) {
+        hubbleFragmentController.onWebEvent(event, properties)
     }
 
 }
