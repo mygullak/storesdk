@@ -61,7 +61,6 @@ object Hubble {
     }
 
 
-    // function to get fragment
     fun initialiseFragment() {
         fragment = WebViewFragment().apply {
             arguments = Bundle().apply {
@@ -73,49 +72,50 @@ object Hubble {
         }
     }
 
-    fun onBackPressed(supportFragmentManager : androidx.fragment.app.FragmentManager): Boolean {
+    fun onBackPressed(supportFragmentManager : androidx.fragment.app.FragmentManager, closeParentActivity: Boolean?= false): Boolean {
         val fragment = supportFragmentManager.findFragmentByTag(fragmentTag) as WebViewFragment
             if (fragment.isVisible) {
                 if (fragment.webView.canGoBack()) {
                     fragment.webView.goBack()
                 } else {
+                    if (closeParentActivity == true) {
+                        return false;
+                    }
                     supportFragmentManager.beginTransaction().hide(fragment).commit()
                 }
                 return  true;
             }
             return false;
     }
-
 }
 
 class HubbleStoreActivity : AppCompatActivity() {
-    private lateinit var fragment: WebViewFragment
-    private val fragmentTag = "hubble_webview_fragment"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fragment = WebViewFragment().apply {
-            arguments = Bundle().apply {
-                putString("clientId", intent.getStringExtra("clientId"))
-                putString("clientSecret", intent.getStringExtra("clientSecret"))
-                putString("authToken", intent.getStringExtra("authToken"))
-                putString("env", intent.getStringExtra("env"))
-            }
-        }
+        Hubble.init(
+            env = intent.getStringExtra("env") ?: "prod",
+            clientId = intent.getStringExtra("clientId") ?: "",
+            clientSecret = intent.getStringExtra("clientSecret") ?: "",
+            token = intent.getStringExtra("authToken") ?: ""
+        )
+        Hubble.initialiseFragment()
 
         supportFragmentManager.beginTransaction()
-            .replace(android.R.id.content, fragment, fragmentTag)
+            .replace(android.R.id.content, Hubble.fragment, Hubble.fragmentTag)
             .commit()
     }
 
     //Handles back button for web-view
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && fragment.webView.canGoBack()) {
-            fragment.webView.goBack()
-            return true
+     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            val hubbleBackCompleted = Hubble.onBackPressed(supportFragmentManager, true)
+            if (hubbleBackCompleted) {
+                return true
+            }
         }
-        return super.onKeyDown(keyCode, event)
+        return super.onKeyDown(keyCode, event);
     }
 }
 
