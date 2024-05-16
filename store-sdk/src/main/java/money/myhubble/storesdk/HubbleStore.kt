@@ -18,6 +18,10 @@ import android.widget.RelativeLayout
 import androidx.activity.ComponentActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 
 
 object Hubble {
@@ -41,7 +45,7 @@ object Hubble {
             return
         }
 
-        val intent = Intent(context, HubbleStore::class.java).apply {
+        val intent = Intent(context, HubbleStoreActivity::class.java).apply {
             putExtra("clientId", clientId)
             putExtra("clientSecret", clientSecret)
             putExtra("authToken", token)
@@ -52,11 +56,61 @@ object Hubble {
 
 }
 
-class HubbleStore() : ComponentActivity() {
+class HubbleStoreActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val fragment = WebViewFragment().apply {
+             arguments = Bundle().apply {
+                putString("clientId", intent.getStringExtra("clientId"))
+                putString("clientSecret", intent.getStringExtra("clientSecret"))
+                putString("authToken", intent.getStringExtra("authToken"))
+                putString("env", intent.getStringExtra("env"))
+            }
+        }
+
+
+        supportFragmentManager.beginTransaction()
+            .replace(android.R.id.content, fragment)
+            .commit()
+    }
+}
+
+
+// class HubbleStoreActivity() : ComponentActivity() {
+//     private lateinit var clientId: String
+//     private lateinit var clientSecret: String
+//     private lateinit var authToken: String
+//     private var env = "prod"
+
+//     //Handles back button for web-view
+//     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+//         if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
+//             webView.goBack()
+//             return true
+//         }
+//         return super.onKeyDown(keyCode, event)
+//     }
+
+//     fun showWebView() {
+//         runOnUiThread {
+//             progressBar.visibility = View.INVISIBLE
+//             webView.visibility = View.VISIBLE
+//         }
+//     }
+
+// }
+
+
+
+
+class WebViewFragment : Fragment() {
     private lateinit var clientId: String
     private lateinit var clientSecret: String
     private lateinit var authToken: String
     private var env = "prod"
+    private lateinit var webView: WebView
+    private lateinit var progressBar: ProgressBar
 
     val baseUrl: String
         get() = if (env == "prod") {
@@ -65,37 +119,42 @@ class HubbleStore() : ComponentActivity() {
             "vouchers.dev.myhubble.money"
         }
 
-    private lateinit var webView: WebView
-    private lateinit var progressBar: ProgressBar
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        clientId = arguments?.getString("clientId") ?: ""
+        clientSecret = arguments?.getString("clientSecret") ?: ""
+        authToken = arguments?.getString("authToken") ?: ""
+        env = arguments?.getString("env") ?: "prod"
+        val context = requireContext()
 
-    @SuppressLint("SetJavaScriptEnabled")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        clientId = intent.getStringExtra("clientId") ?: ""
-        clientSecret = intent.getStringExtra("clientSecret") ?: ""
-        authToken = intent.getStringExtra("authToken") ?: ""
-        env = intent.getStringExtra("env") ?: "prod"
-
-        val constraintLayout = ConstraintLayout(this)
+        val constraintLayout = ConstraintLayout(context)
         constraintLayout.setBackgroundColor(Color.WHITE)
         constraintLayout.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
         )
-        setContentView(constraintLayout)
-        setupProgressBar()
+        setupProgressBar(context)
         constraintLayout.addView(progressBar)
         setupConstraints(constraintLayout)
-        val webViewLayout = LinearLayout.LayoutParams(
+        webView = getWebView(context)
+        constraintLayout.addView(webView)
+
+        return constraintLayout
+    }
+
+    fun getWebView(context: Context ): WebView {
+        val activity = requireActivity()
+
+        val webView = WebView(context)
+        webView.id = View.generateViewId()
+        webView.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
         )
-        webView = WebView(this)
-        webView.id = View.generateViewId()
-        webView.layoutParams = webViewLayout
         webView.visibility = View.INVISIBLE
-
-
+    
         webView.apply {
             settings.javaScriptCanOpenWindowsAutomatically = true
             settings.javaScriptEnabled = true
@@ -103,19 +162,18 @@ class HubbleStore() : ComponentActivity() {
             settings.domStorageEnabled = true
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
-        webView.addJavascriptInterface(WebAppInterface(this), "AndroidHost")
-
-        webView.webViewClient = MyWebViewClient(this@HubbleStore, baseUrl)
-        constraintLayout.addView(webView)
-
-        val url =
-            "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
+        webView.addJavascriptInterface(WebAppInterface(activity), "AndroidHost")
+        webView.webViewClient = MyWebViewClient(activity, baseUrl, this)
+    
+        val url = "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
         webView.loadUrl(url)
-
+    
+        return webView
     }
+   
 
-    private fun setupProgressBar() {
-        progressBar = ProgressBar(this)
+    private fun setupProgressBar(context : Context) {
+        progressBar = ProgressBar(context)
         progressBar.id = View.generateViewId()
         val progressBarParams = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -146,33 +204,21 @@ class HubbleStore() : ComponentActivity() {
         constraintSet.applyTo(constraintLayout);
     }
 
-
-    //Handles back button for web-view
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-            webView.goBack()
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
     fun showWebView() {
-        runOnUiThread {
-            progressBar.visibility = View.INVISIBLE
-            webView.visibility = View.VISIBLE
-        }
+        progressBar.visibility = View.INVISIBLE
+        webView.visibility = View.VISIBLE
     }
-
 }
 
 
 private class MyWebViewClient(
-    val activity: HubbleStore,
-    val baseUrl: String
+    val activity: ComponentActivity,
+    val baseUrl: String,
+    val fragment: WebViewFragment,
 ) : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
-        activity.showWebView()
+        fragment.showWebView()
     }
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -194,7 +240,7 @@ private class MyWebViewClient(
 
 }
 
-class WebAppInterface(private val activity: HubbleStore) {
+class WebAppInterface(private val activity: ComponentActivity) {
     @JavascriptInterface
     fun close() {
         activity.finish()
