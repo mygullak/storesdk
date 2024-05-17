@@ -29,9 +29,9 @@ import android.os.Build
 import android.text.Html
 
 
-class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager){
+class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager) {
 
-   lateinit var fragment: HubbleFragment
+    lateinit var fragment: HubbleFragment
     val fragmentTag = "hubble_webview_fragment"
 
     lateinit var env: String
@@ -40,6 +40,7 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
     lateinit var token: String
 
     lateinit var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit
+    lateinit var onAppBarBackButtonClicked: () -> Unit
 
 
     fun init(
@@ -48,12 +49,14 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
         clientSecret: String,
         token: String,
         onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit,
+        onAppBarBackButtonClicked: () -> Unit,
     ) {
         this.env = env
         this.clientId = clientId
         this.clientSecret = clientSecret
         this.token = token
         this.onAnalyticsEvent = onAnalyticsEvent
+        this.onAppBarBackButtonClicked = onAppBarBackButtonClicked
         onAfterInit()
     }
 
@@ -63,7 +66,7 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
     }
 
 
-   private fun onAfterInit() {
+    private fun onAfterInit() {
         // initialise the fragment
         fragment = HubbleFragment(this).apply {
             arguments = Bundle().apply {
@@ -77,19 +80,26 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
 
     fun goBack(): Boolean {
         val fragment = findFragment()
-        if (fragment.isVisible && fragment.webView.canGoBack() ){
-                fragment.webView.goBack()
-                return true;
+        if (fragment == null) {
+            return false
+        }
+
+        if (fragment.isVisible && fragment.webView.canGoBack()) {
+            fragment.webView.goBack()
+            return true;
         }
         return false;
     }
 
-    fun findFragment(): HubbleFragment {
-        return this.supportFragmentManager.findFragmentByTag(fragmentTag) as HubbleFragment
+    fun findFragment(): HubbleFragment? {
+        return this.supportFragmentManager.findFragmentByTag(fragmentTag) as HubbleFragment?
     }
 
     fun onBackPressed(closeParentActivity: Boolean? = false): Boolean {
         val fragment = findFragment()
+        if (fragment == null) {
+            return false
+        }
         if (fragment.isVisible) {
             if (fragment.webView.canGoBack()) {
                 fragment.webView.goBack()
@@ -106,7 +116,18 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
 
     fun hide() {
         val fragment = findFragment()
+        if (fragment == null) {
+            return Unit
+        }
         supportFragmentManager.beginTransaction().hide(fragment).commit()
+    }
+
+    fun show() {
+        val fragment = findFragment()
+        if (fragment == null) {
+            return Unit
+        }
+        supportFragmentManager.beginTransaction().show(fragment).commit()
     }
 
 }
@@ -166,7 +187,11 @@ class HubbleStoreActivity : AppCompatActivity() {
             clientId = intent.getStringExtra("clientId") ?: "",
             clientSecret = intent.getStringExtra("clientSecret") ?: "",
             token = intent.getStringExtra("authToken") ?: "",
-            onAnalyticsEvent = hubbleActivityController?.onAnalyticsEvent ?: { eventName, properties -> Unit}
+            onAnalyticsEvent = hubbleActivityController?.onAnalyticsEvent
+                ?: { eventName, properties -> Unit },
+            onAppBarBackButtonClicked = {
+                finish()
+            }
         )
 
 
@@ -250,7 +275,7 @@ class HubbleFragment(private val hubbleFragmentController: HubbleFragmentControl
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
         webView.addJavascriptInterface(
-            WebAppInterface(activity, hubbleFragmentController),
+            WebAppInterface(hubbleFragmentController),
             "AndroidHost"
         )
         webView.webViewClient = MyWebViewClient(activity, baseUrl, this)
@@ -332,12 +357,11 @@ private class MyWebViewClient(
 }
 
 class WebAppInterface(
-    private val activity: ComponentActivity,
     private val hubbleFragmentController: HubbleFragmentController
 ) {
     @JavascriptInterface
     fun close() {
-        activity.finish()
+        hubbleFragmentController.onAppBarBackButtonClicked()
     }
 
     @JavascriptInterface

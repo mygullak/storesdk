@@ -50,9 +50,9 @@ class MainActivity : AppCompatActivity() {
             val hubbleBackCompleted = hubbleFragmentController.goBack()
             if (hubbleBackCompleted) {
                 return true
-            } else if (hubbleFragmentController.findFragment().isVisible){
+            } else if (hubbleFragmentController.findFragment()?.isVisible == true) {
                 hubbleFragmentController.hide()
-                return  true;
+                return true;
             }
         }
         return super.onKeyDown(keyCode, event);
@@ -68,13 +68,16 @@ class MainActivity : AppCompatActivity() {
             clientId = "visit-health",
             clientSecret = "sCOZ07mzht",
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-            onAnalyticsEvent =  { eventName, properties ->
-            println("Event from fragment is : $eventName")
-            // decode and print the properties
-            // println("Properties: $properties")
-            val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
-            println("Properties: $jsonObject")
-        }
+            onAnalyticsEvent = { eventName, properties ->
+                println("Event from fragment is : $eventName")
+                // decode and print the properties
+                // println("Properties: $properties")
+                val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
+                println("Properties: $jsonObject")
+            },
+            onAppBarBackButtonClicked = {
+                hubbleFragmentController.hide()
+            }
         )
 
 
@@ -84,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             clientId = "visit-health",
             clientSecret = "sCOZ07mzht",
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-            onAnalyticsEvent =  { eventName, properties ->
+            onAnalyticsEvent = { eventName, properties ->
                 println("Event from fragment is : $eventName")
                 // decode and print the properties
                 // println("Properties: $properties")
@@ -123,13 +126,17 @@ class MainActivity : AppCompatActivity() {
         ) {
             Button(
                 onClick = {
-                    (context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                        .replace(
-                            android.R.id.content,
-                            hubbleFragmentController.fragment,
-                            hubbleFragmentController.fragmentTag
-                        )
-                        .commit()
+                    if (hubbleFragmentController.findFragment() != null) {
+                        hubbleFragmentController.show()
+                    } else {
+                        (context as AppCompatActivity).supportFragmentManager.beginTransaction()
+                            .replace(
+                                android.R.id.content,
+                                hubbleFragmentController.fragment,
+                                hubbleFragmentController.fragmentTag
+                            )
+                            .commit()
+                    }
                 },
                 modifier = Modifier
                     .width(130.dp)
