@@ -20,8 +20,7 @@ import androidx.compose.ui.unit.dp
 import money.mygullak.android_web.ui.theme.HubbleandroidwebTheme
 import money.myhubble.storesdk.HubbleFragment
 import androidx.appcompat.app.AppCompatActivity
-import money.myhubble.storesdk.HubbleFragmentController
-import money.myhubble.storesdk.HubbleActivityController
+import money.myhubble.storesdk.Hubble
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
@@ -33,25 +32,20 @@ import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
-    // This example show the usage of HubbleFragmentController and HubbleActivityController
-    // to launch the Hubble webview in a fragment and an activity respectively
-
-    // Initialising both is not necessary, you can choose to use either of them
-    // as per your requirement
-
-    private val hubbleFragmentController = HubbleFragmentController(supportFragmentManager)
-    private val hubbleActivityController = HubbleActivityController()
 
 
     // this must be there in your activity if you want
     // to launch the Hubble webview in a fragment
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val hubbleFragment = Hubble.getHubbleFragment();
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val hubbleBackCompleted = hubbleFragmentController.goBack()
-            if (hubbleBackCompleted) {
-                return true
-            } else if (hubbleFragmentController.findFragment()?.isVisible == true) {
-                hubbleFragmentController.hide()
+            if(hubbleFragment.isVisible && hubbleFragment.webView.canGoBack()){
+                hubbleFragment.webView.goBack();
+                return true;
+            }
+
+            else if (hubbleFragment.isVisible) {
+                supportFragmentManager.beginTransaction().hide(hubbleFragment).commit()
                 return true;
             }
         }
@@ -61,9 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // initialising the HubbleFragment
-        hubbleFragmentController.init(
+        Hubble.init(
             env = "debug",
             clientId = "visit-health",
             clientSecret = "sCOZ07mzht",
@@ -76,25 +68,10 @@ class MainActivity : AppCompatActivity() {
                 println("Properties: $jsonObject")
             },
             onAppBarBackButtonClicked = {
-                hubbleFragmentController.hide()
+                supportFragmentManager.beginTransaction().hide(Hubble.getHubbleFragment()).commit()
             }
         )
 
-
-        //initialising the HubbleActivity
-        hubbleActivityController.init(
-            env = "debug",
-            clientId = "visit-health",
-            clientSecret = "sCOZ07mzht",
-            token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-            onAnalyticsEvent = { eventName, properties ->
-                println("Event from fragment is : $eventName")
-                // decode and print the properties
-                // println("Properties: $properties")
-                val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
-                println("Properties: $jsonObject")
-            }
-        )
 
         setContent {
             // HubbleandroidwebTheme {
@@ -122,21 +99,18 @@ class MainActivity : AppCompatActivity() {
     // This function will open the Hubble webview in a fragment
     fun HubbleFragmentButton() {
         val context = LocalContext.current
+        val hubbleFragment = Hubble.getHubbleFragment()
         Box(
         ) {
             Button(
                 onClick = {
-                    if (hubbleFragmentController.findFragment() != null) {
-                        hubbleFragmentController.show()
-                    } else {
                         (context as AppCompatActivity).supportFragmentManager.beginTransaction()
                             .replace(
                                 android.R.id.content,
-                                hubbleFragmentController.fragment,
-                                hubbleFragmentController.fragmentTag
+                                hubbleFragment,
+                                "hubble_sdk"
                             )
                             .commit()
-                    }
                 },
                 modifier = Modifier
                     .width(130.dp)
@@ -156,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         ) {
             Button(
                 onClick = {
-                    hubbleActivityController.launchActivity(context)
+                    Hubble.launchActivity(context)
                 },
 
                 modifier = Modifier
