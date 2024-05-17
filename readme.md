@@ -1,3 +1,30 @@
+# Hubble Android SDK
+
+Welcome to the Hubble Android SDK. This SDK allows you to integrate Hubble's services into your Android application seamlessly.
+
+## Features
+
+- Feature 1
+- Feature 2
+- Feature 3
+- ...
+
+## Installation
+
+To add the Hubble Android SDK to your project, add the following to your `build.gradle` file:
+
+```gradle
+dependencies {
+    implementation 'com.hubble:android-sdk:1.0.0'
+}
+```
+
+## Usage
+
+Here is a simple example of how to use the Hubble Android SDK:
+
+```
+
 package money.mygullak.android_web
 
 import android.os.Bundle
@@ -173,3 +200,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
+
+```
