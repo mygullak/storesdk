@@ -281,7 +281,7 @@ class HubbleFragment(private val hubbleFragmentController: HubbleFragmentControl
         webView.webViewClient = MyWebViewClient(activity, baseUrl, this)
 
         val url =
-            "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken"
+            "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$authToken&wrap-plt=an"
         webView.loadUrl(url)
 
         return webView
