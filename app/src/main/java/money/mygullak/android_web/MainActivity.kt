@@ -47,9 +47,12 @@ class MainActivity : AppCompatActivity() {
     // to launch the Hubble webview in a fragment
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val hubbleBackCompleted = hubbleFragmentController.onBackPressed()
+            val hubbleBackCompleted = hubbleFragmentController.goBack()
             if (hubbleBackCompleted) {
                 return true
+            } else if (hubbleFragmentController.findFragment().isVisible){
+                hubbleFragmentController.hide()
+                return  true;
             }
         }
         return super.onKeyDown(keyCode, event);
@@ -65,15 +68,15 @@ class MainActivity : AppCompatActivity() {
             clientId = "visit-health",
             clientSecret = "sCOZ07mzht",
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
-        )
-
-        hubbleFragmentController.onAnalyticsEvent = { eventName, properties ->
+            onAnalyticsEvent =  { eventName, properties ->
             println("Event from fragment is : $eventName")
             // decode and print the properties
             // println("Properties: $properties")
             val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
             println("Properties: $jsonObject")
         }
+        )
+
 
         //initialising the HubbleActivity
         hubbleActivityController.init(
@@ -81,13 +84,14 @@ class MainActivity : AppCompatActivity() {
             clientId = "visit-health",
             clientSecret = "sCOZ07mzht",
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+            onAnalyticsEvent =  { eventName, properties ->
+                println("Event from fragment is : $eventName")
+                // decode and print the properties
+                // println("Properties: $properties")
+                val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
+                println("Properties: $jsonObject")
+            }
         )
-
-        // setting the onAnalyticsEvent for the HubbleActivity
-        hubbleActivityController.onAnalyticsEvent = { event, properties ->
-            println("Event from activity is : $event")
-            println("Properties: $properties")
-        }
 
         setContent {
             // HubbleandroidwebTheme {

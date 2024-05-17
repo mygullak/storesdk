@@ -31,7 +31,7 @@ import android.text.Html
 
 class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager){
 
-    lateinit var fragment: HubbleFragment
+   lateinit var fragment: HubbleFragment
     val fragmentTag = "hubble_webview_fragment"
 
     lateinit var env: String
@@ -39,20 +39,21 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
     lateinit var clientSecret: String
     lateinit var token: String
 
-    var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit =
-    { _, _ -> {} }
+    lateinit var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit
 
 
     fun init(
         env: String,
         clientId: String,
         clientSecret: String,
-        token: String
+        token: String,
+        onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit,
     ) {
         this.env = env
         this.clientId = clientId
         this.clientSecret = clientSecret
         this.token = token
+        this.onAnalyticsEvent = onAnalyticsEvent
         onAfterInit()
     }
 
@@ -72,6 +73,15 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
                 putString("env", env)
             }
         }
+    }
+
+    fun goBack(): Boolean {
+        val fragment = findFragment()
+        if (fragment.isVisible && fragment.webView.canGoBack() ){
+                fragment.webView.goBack()
+                return true;
+        }
+        return false;
     }
 
     fun findFragment(): HubbleFragment {
@@ -94,7 +104,7 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
         return false;
     }
 
-    fun hideFragment() {
+    fun hide() {
         val fragment = findFragment()
         supportFragmentManager.beginTransaction().hide(fragment).commit()
     }
@@ -125,20 +135,21 @@ class HubbleActivityController {
     lateinit var clientSecret: String
     lateinit var token: String
 
-    var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit =
-    { _, _ -> {} }
+    lateinit var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit
 
 
     fun init(
         env: String,
         clientId: String,
         clientSecret: String,
-        token: String
+        token: String,
+        onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit,
     ) {
         this.env = env
         this.clientId = clientId
         this.clientSecret = clientSecret
         this.token = token
+        this.onAnalyticsEvent = onAnalyticsEvent
     }
 
 }
@@ -154,10 +165,10 @@ class HubbleStoreActivity : AppCompatActivity() {
             env = intent.getStringExtra("env") ?: "prod",
             clientId = intent.getStringExtra("clientId") ?: "",
             clientSecret = intent.getStringExtra("clientSecret") ?: "",
-            token = intent.getStringExtra("authToken") ?: ""
+            token = intent.getStringExtra("authToken") ?: "",
+            onAnalyticsEvent = hubbleActivityController?.onAnalyticsEvent ?: { eventName, properties -> Unit}
         )
 
-        hubbleFragmentController.onAnalyticsEvent = hubbleActivityController?.onAnalyticsEvent ?: { eventName, properties -> {}}
 
         supportFragmentManager.beginTransaction()
             .replace(
