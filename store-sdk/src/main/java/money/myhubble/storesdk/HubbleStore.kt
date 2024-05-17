@@ -22,13 +22,25 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import org.json.JSONException
+import android.os.Build
+import android.text.Html
 
-open class HubbleBase {
+
+class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager){
+
+    lateinit var fragment: HubbleFragment
+    val fragmentTag = "hubble_webview_fragment"
 
     lateinit var env: String
     lateinit var clientId: String
     lateinit var clientSecret: String
     lateinit var token: String
+
+    var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit =
+    { _, _ -> {} }
 
 
     fun init(
@@ -44,24 +56,15 @@ open class HubbleBase {
         onAfterInit()
     }
 
-    open fun onAfterInit() {
-        // override this method to perform any action after init
+
+    fun getHubbleFragment(): HubbleFragment {
+        return fragment
     }
 
-    var onWebEvent: (event: String, properties: Map<String, String>?) -> Unit =
-    { event, properties -> {} }
-}
 
-class HubbleFragmentController public constructor(private var supportFragmentManager: androidx.fragment.app.FragmentManager) :
-    HubbleBase() {
-
-    lateinit var fragment: WebViewFragment
-    val fragmentTag = "hubble_webview_fragment"
-
-
-    override fun onAfterInit() {
+   private fun onAfterInit() {
         // initialise the fragment
-        fragment = WebViewFragment(this).apply {
+        fragment = HubbleFragment(this).apply {
             arguments = Bundle().apply {
                 putString("clientId", clientId)
                 putString("clientSecret", clientSecret)
@@ -71,8 +74,8 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
         }
     }
 
-    fun findFragment(): WebViewFragment {
-        return this.supportFragmentManager.findFragmentByTag(fragmentTag) as WebViewFragment
+    fun findFragment(): HubbleFragment {
+        return this.supportFragmentManager.findFragmentByTag(fragmentTag) as HubbleFragment
     }
 
     fun onBackPressed(closeParentActivity: Boolean? = false): Boolean {
@@ -100,7 +103,7 @@ class HubbleFragmentController public constructor(private var supportFragmentMan
 
 private var hubbleActivityController: HubbleActivityController? = null
 
-class HubbleActivityController : HubbleBase() {
+class HubbleActivityController {
     fun launchActivity(context: Context) {
         if (clientId.isEmpty() || clientSecret.isEmpty() || token.isEmpty()) {
             return
@@ -116,11 +119,33 @@ class HubbleActivityController : HubbleBase() {
         }
         context.startActivity(intent)
     }
+
+    lateinit var env: String
+    lateinit var clientId: String
+    lateinit var clientSecret: String
+    lateinit var token: String
+
+    var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit =
+    { _, _ -> {} }
+
+
+    fun init(
+        env: String,
+        clientId: String,
+        clientSecret: String,
+        token: String
+    ) {
+        this.env = env
+        this.clientId = clientId
+        this.clientSecret = clientSecret
+        this.token = token
+    }
+
 }
 
 class HubbleStoreActivity : AppCompatActivity() {
 
-    val hubbleFragmentController = HubbleFragmentController(supportFragmentManager);
+    private val hubbleFragmentController = HubbleFragmentController(supportFragmentManager);
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,7 +157,7 @@ class HubbleStoreActivity : AppCompatActivity() {
             token = intent.getStringExtra("authToken") ?: ""
         )
 
-        hubbleFragmentController.onWebEvent = hubbleActivityController?.onWebEvent ?: { event, properties -> {}}
+        hubbleFragmentController.onAnalyticsEvent = hubbleActivityController?.onAnalyticsEvent ?: { eventName, properties -> {}}
 
         supportFragmentManager.beginTransaction()
             .replace(
@@ -144,18 +169,18 @@ class HubbleStoreActivity : AppCompatActivity() {
     }
 
     //Handles back button for web-view
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    override fun onKeyDown(keyCode: Int, eventName: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             val hubbleBackCompleted = hubbleFragmentController.onBackPressed(true)
             if (hubbleBackCompleted) {
                 return true
             }
         }
-        return super.onKeyDown(keyCode, event);
+        return super.onKeyDown(keyCode, eventName);
     }
 }
 
-class WebViewFragment(private val hubbleFragmentController: HubbleFragmentController) : Fragment() {
+class HubbleFragment(private val hubbleFragmentController: HubbleFragmentController) : Fragment() {
     private lateinit var clientId: String
     private lateinit var clientSecret: String
     private lateinit var authToken: String
@@ -269,7 +294,7 @@ class WebViewFragment(private val hubbleFragmentController: HubbleFragmentContro
 private class MyWebViewClient(
     val activity: ComponentActivity,
     val baseUrl: String,
-    val fragment: WebViewFragment,
+    val fragment: HubbleFragment,
 ) : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
@@ -305,8 +330,20 @@ class WebAppInterface(
     }
 
     @JavascriptInterface
-    fun onWebEvent(event: String, properties: Map<String, String>?) {
-        hubbleFragmentController.onWebEvent(event, properties)
+    fun onAnalyticsEvent(eventName: String, properties: String?) {
+        hubbleFragmentController.onAnalyticsEvent(eventName, decodeString(properties ?: "{}"))
+    }
+
+    @Throws(JSONException::class)
+    private fun decodeString(response: String): JsonObject {
+        return if (Build.VERSION.SDK_INT >= 24) {
+            Gson().fromJson(
+                Html.fromHtml(response, Html.FROM_HTML_MODE_LEGACY).toString(),
+                JsonObject::class.java
+            )
+        } else {
+            Gson().fromJson(Html.fromHtml(response).toString(), JsonObject::class.java)
+        }
     }
 
 }

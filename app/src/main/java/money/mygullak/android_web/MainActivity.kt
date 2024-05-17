@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import money.mygullak.android_web.ui.theme.HubbleandroidwebTheme
-import money.myhubble.storesdk.WebViewFragment
+import money.myhubble.storesdk.HubbleFragment
 import androidx.appcompat.app.AppCompatActivity
 import money.myhubble.storesdk.HubbleFragmentController
 import money.myhubble.storesdk.HubbleActivityController
@@ -27,6 +27,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
 import android.webkit.WebView
 import android.view.KeyEvent
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
@@ -64,9 +67,12 @@ class MainActivity : AppCompatActivity() {
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
         )
 
-        hubbleFragmentController.onWebEvent = { event, properties ->
-            println("Event from fragment is : $event")
-            println("Properties: $properties")
+        hubbleFragmentController.onAnalyticsEvent = { eventName, properties ->
+            println("Event from fragment is : $eventName")
+            // decode and print the properties
+            // println("Properties: $properties")
+            val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
+            println("Properties: $jsonObject")
         }
 
         //initialising the HubbleActivity
@@ -77,8 +83,8 @@ class MainActivity : AppCompatActivity() {
             token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
         )
 
-        // setting the onWebEvent for the HubbleActivity
-        hubbleActivityController.onWebEvent = { event, properties ->
+        // setting the onAnalyticsEvent for the HubbleActivity
+        hubbleActivityController.onAnalyticsEvent = { event, properties ->
             println("Event from activity is : $event")
             println("Properties: $properties")
         }
