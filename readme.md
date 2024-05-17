@@ -2,24 +2,69 @@
 
 Welcome to the Hubble Android SDK. This SDK allows you to integrate Hubble's services into your Android application seamlessly.
 
-## Features
-
-- Feature 1
-- Feature 2
-- Feature 3
-- ...
-
-## Installation
+## Usage
 
 To add the Hubble Android SDK to your project, add the following to your `build.gradle` file:
 
-```gradle
-dependencies {
-    implementation 'com.hubble:android-sdk:1.0.0'
+1. Add Jitpack repository to your project’s Gradle file
+
+```
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") } //Add this line
+    }
 }
 ```
 
-## Usage
+2. Add the dependency to your Gradle file.
+
+```
+dependencies {
+    implementation ("money.myhubble:storesdk:0.0.2")
+}
+```
+
+3. Initiate our SDK using the below code snippet.
+
+```
+ private val hubbleFragmentController = HubbleFragmentController(supportFragmentManager)
+
+ hubbleFragmentController.init(
+ env = "debug",
+ clientId = "visit-health",
+ clientSecret = "sCOZ07mzht",
+ token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+ onAnalyticsEvent = { eventName, properties ->
+ println("Event from fragment is : $eventName")
+ // decode and print the properties
+ // println("Properties: $properties")
+ val jsonObject = Gson().fromJson(properties, JsonObject::class.java)
+ println("Properties: $jsonObject")
+ },
+ onAppBarBackButtonClicked = {
+ hubbleFragmentController.hide()
+ }
+ )
+
+```
+
+4. use fragment
+
+```
+(context as AppCompatActivity).supportFragmentManager.beginTransaction()
+.replace(
+android.R.id.content,
+hubbleFragmentController.fragment,
+hubbleFragmentController.fragmentTag
+)
+.commit()
+
+```
+
+## Example
 
 Here is a simple example of how to use the Hubble Android SDK:
 
