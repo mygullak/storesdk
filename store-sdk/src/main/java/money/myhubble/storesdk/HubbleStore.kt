@@ -39,8 +39,6 @@ object Hubble {
     lateinit var onAnalyticsEvent: (eventName: String, properties: JsonObject?) -> Unit
     lateinit var onAppBarBackButtonClicked: () -> Unit
 
-    var frg: HubbleFragment? = null
-
 
     fun init(
         env: String,
@@ -61,11 +59,7 @@ object Hubble {
 
     fun getHubbleFragment(): HubbleFragment {
 
-        if (frg != null) {
-            return frg as HubbleFragment
-        }
-
-        frg = HubbleFragment(this).apply {
+        val frg = HubbleFragment(this).apply {
             arguments = Bundle().apply {
                 putString("clientId", clientId)
                 putString("clientSecret", clientSecret)
@@ -100,8 +94,7 @@ object Hubble {
 
 class HubbleStoreActivity : AppCompatActivity() {
 
-//    private val hubbleFragmentController = HubbleFragmentController(supportFragmentManager);
-
+    lateinit var hubbleFragment: HubbleFragment 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,12 +110,12 @@ class HubbleStoreActivity : AppCompatActivity() {
             }
         );
 
-
+        hubbleFragment = Hubble.getHubbleFragment()
 
         supportFragmentManager.beginTransaction()
             .replace(
                 android.R.id.content,
-                Hubble.getHubbleFragment(),
+                hubbleFragment,
                 "hubble_sdk"
             )
             .commit()
@@ -131,8 +124,8 @@ class HubbleStoreActivity : AppCompatActivity() {
     //Handles back button for web-view
     override fun onKeyDown(keyCode: Int, eventName: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (Hubble.getHubbleFragment().isVisible && Hubble.getHubbleFragment().webView.canGoBack()) {
-                Hubble.getHubbleFragment().webView.goBack();
+            if (hubbleFragment.isVisible && hubbleFragment.webView.canGoBack()) {
+                hubbleFragment.webView.goBack();
                 return true;
             }
 

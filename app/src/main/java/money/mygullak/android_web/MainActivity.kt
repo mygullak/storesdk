@@ -33,18 +33,16 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var hubbleFragment: HubbleFragment
 
     // this must be there in your activity if you want
     // to launch the Hubble webview in a fragment
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        val hubbleFragment = Hubble.getHubbleFragment();
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if(hubbleFragment.isVisible && hubbleFragment.webView.canGoBack()){
+            if (hubbleFragment.isVisible && hubbleFragment.webView.canGoBack()) {
                 hubbleFragment.webView.goBack();
                 return true;
-            }
-
-            else if (hubbleFragment.isVisible) {
+            } else if (hubbleFragment.isVisible) {
                 supportFragmentManager.beginTransaction().hide(hubbleFragment).commit()
                 return true;
             }
@@ -68,9 +66,11 @@ class MainActivity : AppCompatActivity() {
                 println("Properties: $jsonObject")
             },
             onAppBarBackButtonClicked = {
-                supportFragmentManager.beginTransaction().hide(Hubble.getHubbleFragment()).commit()
+                supportFragmentManager.beginTransaction().hide(hubbleFragment).commit()
             }
         )
+
+        hubbleFragment = Hubble.getHubbleFragment()
 
 
         setContent {
@@ -99,11 +99,14 @@ class MainActivity : AppCompatActivity() {
     // This function will open the Hubble webview in a fragment
     fun HubbleFragmentButton() {
         val context = LocalContext.current
-        val hubbleFragment = Hubble.getHubbleFragment()
         Box(
         ) {
             Button(
                 onClick = {
+
+                    if (hubbleFragment.isAdded) {
+                        supportFragmentManager.beginTransaction().show(hubbleFragment).commit()
+                    } else {
                         (context as AppCompatActivity).supportFragmentManager.beginTransaction()
                             .replace(
                                 android.R.id.content,
@@ -111,6 +114,10 @@ class MainActivity : AppCompatActivity() {
                                 "hubble_sdk"
                             )
                             .commit()
+
+                    }
+
+
                 },
                 modifier = Modifier
                     .width(130.dp)
