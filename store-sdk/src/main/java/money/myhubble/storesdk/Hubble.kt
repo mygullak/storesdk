@@ -18,6 +18,8 @@ object Hubble {
     private lateinit var onAnalyticsEvent: (eventName: String, Map<String, Any>) -> Unit
     private lateinit var style: HubbleStyleOptions
 
+    const val LOG_TAG = "hubble"
+
     fun init(
         env: String,
         clientId: String,
@@ -26,7 +28,7 @@ object Hubble {
         style: HubbleStyleOptions = HubbleStyleOptions(disableHomeBackBtn = false),
         onAnalyticsEvent: (eventName: String, properties: Map<String, Any>) -> Unit = { e, p ->
             Log.i(
-                "hubble",
+                LOG_TAG,
                 "Event - $e - received from Hubble webview"
             )
         }
@@ -53,8 +55,8 @@ object Hubble {
         context.startActivity(intent)
     }
 
-    fun processAnalyticsEvent(event: String, properties: Map<String, Any>) {
-        this.onAnalyticsEvent(event, properties)
+    fun processAnalyticsEvent(event: String, properties: Map<String, Any>?) {
+        this.onAnalyticsEvent(event, properties ?: mapOf())
     }
 
     fun getFragment(context: Context): HubbleFragment {
