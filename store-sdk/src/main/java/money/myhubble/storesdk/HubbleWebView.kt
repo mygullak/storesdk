@@ -1,13 +1,10 @@
 package money.myhubble.storesdk
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Build
 import android.text.Html
 import android.webkit.JavascriptInterface
-import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.google.gson.Gson
@@ -52,8 +49,13 @@ class WebAppInterface(
     }
 
     @JavascriptInterface
+    fun reload() {
+        fragment.reload()
+    }
+
+    @JavascriptInterface
     fun onAnalyticsEvent(eventName: String, properties: String?) {
-        Hubble.onAnalyticsEvent(eventName, decodeString(properties ?: "{}"))
+        Hubble.processAnalyticsEvent(eventName, decodeString(properties ?: "{}"))
     }
 
     @Throws(JSONException::class)

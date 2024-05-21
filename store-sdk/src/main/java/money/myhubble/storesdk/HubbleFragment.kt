@@ -137,4 +137,8 @@ class HubbleFragment() : Fragment() {
         progressBar.visibility = View.INVISIBLE
         webView.visibility = View.VISIBLE
     }
+
+    fun reload() {
+        webView.reload()
+    }
 }

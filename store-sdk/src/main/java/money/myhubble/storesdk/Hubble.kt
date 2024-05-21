@@ -53,7 +53,7 @@ object Hubble {
         context.startActivity(intent)
     }
 
-    fun onAnalyticsEvent(event: String, properties: Map<String, Any>) {
+    fun processAnalyticsEvent(event: String, properties: Map<String, Any>) {
         this.onAnalyticsEvent(event, properties)
     }
 
