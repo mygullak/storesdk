@@ -12,7 +12,7 @@ class HubbleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hubbleFragment = Hubble.getFragment(this)
+        hubbleFragment = Hubble.getFragment()
 
         supportFragmentManager.beginTransaction()
             .replace(

@@ -16,7 +16,7 @@ object Hubble {
     private lateinit var clientSecret: String
     private lateinit var token: String
     private lateinit var onAnalyticsEvent: (eventName: String, Map<String, Any>) -> Unit
-    private lateinit var style: HubbleStyleOptions
+//    private lateinit var style: HubbleStyleOptions
 
     const val LOG_TAG = "hubble"
 
@@ -25,7 +25,7 @@ object Hubble {
         clientId: String,
         clientSecret: String,
         token: String,
-        style: HubbleStyleOptions = HubbleStyleOptions(disableHomeBackBtn = false),
+        // style: HubbleStyleOptions = HubbleStyleOptions(disableHomeBackBtn = false), TODO later
         onAnalyticsEvent: (eventName: String, properties: Map<String, Any>) -> Unit = { e, p ->
             Log.i(
                 LOG_TAG,
@@ -38,7 +38,7 @@ object Hubble {
         this.clientSecret = clientSecret
         this.token = token
         this.onAnalyticsEvent = onAnalyticsEvent
-        this.style = style
+//        this.style = style
     }
 
     fun open(context: Context) {
@@ -59,7 +59,7 @@ object Hubble {
         this.onAnalyticsEvent(event, properties ?: mapOf())
     }
 
-    fun getFragment(context: Context): HubbleFragment {
+    fun getFragment(): HubbleFragment {
         val fragment: HubbleFragment = HubbleFragment().apply {
             arguments = Bundle().apply {
                 putString(Key.CLIENT_ID, clientId)
