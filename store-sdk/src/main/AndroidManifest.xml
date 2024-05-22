@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <queries>
         <package android:name="com.phonepe.app" />
         <package android:name="net.one97.paytm" />
@@ -9,10 +10,10 @@
         <package android:name="com.dreamplug.androidapp" />
     </queries>
     <application>
-    <activity
-        android:name="money.myhubble.storesdk.HubbleStoreActivity"
-        android:exported="false"
-        android:hardwareAccelerated="true"
-        android:theme="@style/Theme.Design.NoActionBar" />
+        <activity
+            android:name="money.myhubble.storesdk.HubbleActivity"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.Design.NoActionBar" />
     </application>
 </manifest>

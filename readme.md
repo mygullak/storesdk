@@ -1,6 +1,7 @@
 # Hubble Android SDK
 
-Welcome to the Hubble Android SDK. This SDK allows you to integrate Hubble's services into your Android application seamlessly.
+Welcome to the Hubble Android SDK. This SDK allows you to integrate Hubble's services into your
+Android application seamlessly.
 
 ## Usage
 
