@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                                 clientSecret = "sCOZ07mzht",
                                 token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                                 onAnalyticsEvent = { eventName: String, props: Map<String, Any> ->
-                                    Log.i("main-activity", "received event $eventName from Hubble")
+                                    Log.i("main-activity", "received event $eventName from Hubble ${props}")
                                 }
                         )
                         Hubble.open(context)
