@@ -15,12 +15,12 @@ class HubbleActivity : AppCompatActivity() {
         hubbleFragment = Hubble.getFragment()
 
         supportFragmentManager.beginTransaction()
-            .replace(
-                android.R.id.content,
-                hubbleFragment,
-                hubbleFragmentTag
-            )
-            .commit()
+                .replace(
+                        android.R.id.content,
+                        hubbleFragment,
+                        hubbleFragmentTag
+                )
+                .commit()
     }
 
     override fun onKeyDown(keyCode: Int, eventName: KeyEvent?): Boolean {

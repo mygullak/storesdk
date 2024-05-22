@@ -7,7 +7,7 @@ import android.util.Log
 
 
 data class HubbleStyleOptions(
-    val disableHomeBackBtn: Boolean
+        val disableHomeBackBtn: Boolean
 )
 
 object Hubble {
@@ -21,17 +21,17 @@ object Hubble {
     const val LOG_TAG = "hubble"
 
     fun init(
-        env: String,
-        clientId: String,
-        clientSecret: String,
-        token: String,
-        // style: HubbleStyleOptions = HubbleStyleOptions(disableHomeBackBtn = false), TODO later
-        onAnalyticsEvent: (eventName: String, properties: Map<String, Any>) -> Unit = { e, p ->
-            Log.i(
-                LOG_TAG,
-                "Event - $e - received from Hubble webview"
-            )
-        }
+            env: String,
+            clientId: String,
+            clientSecret: String,
+            token: String,
+            // style: HubbleStyleOptions = HubbleStyleOptions(disableHomeBackBtn = false), TODO later
+            onAnalyticsEvent: (eventName: String, properties: Map<String, Any>) -> Unit = { e, p ->
+                Log.i(
+                        LOG_TAG,
+                        "Event - $e - received from Hubble webview"
+                )
+            }
     ) {
         this.env = env
         this.clientId = clientId

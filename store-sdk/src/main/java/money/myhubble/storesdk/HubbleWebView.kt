@@ -11,8 +11,8 @@ import org.json.JSONObject
 
 
 class HubbleWebViewClient(
-    private val baseUrl: String,
-    private val fragment: HubbleFragment,
+        private val baseUrl: String,
+        private val fragment: HubbleFragment,
 ) : WebViewClient() {
 
     override fun onPageFinished(view: WebView?, url: String?) {
@@ -39,7 +39,7 @@ class HubbleWebViewClient(
 }
 
 class WebAppInterface(
-    val fragment: HubbleFragment
+        val fragment: HubbleFragment
 ) {
     @JavascriptInterface
     fun close() {
@@ -53,10 +53,9 @@ class WebAppInterface(
 
     @JavascriptInterface
     fun onAnalyticsEvent(eventName: String, properties: String?) {
-        if (properties==null) {
+        if (properties == null) {
             Hubble.processAnalyticsEvent(eventName, null)
-        }
-        else {
+        } else {
             Hubble.processAnalyticsEvent(eventName, decodeString(properties))
         }
     }

@@ -32,8 +32,8 @@ class HubbleFragment() : Fragment() {
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         clientId = arguments?.getString(Key.CLIENT_ID) ?: ""
         clientSecret = arguments?.getString(Key.CLIENT_SECRET) ?: ""
@@ -44,8 +44,8 @@ class HubbleFragment() : Fragment() {
         val constraintLayout = ConstraintLayout(context)
         constraintLayout.setBackgroundColor(Color.WHITE)
         constraintLayout.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
         )
         setupProgressBar(context)
         constraintLayout.addView(progressBar)
@@ -62,8 +62,8 @@ class HubbleFragment() : Fragment() {
         val webView = WebView(context)
         webView.id = View.generateViewId()
         webView.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
         )
         webView.visibility = View.INVISIBLE
 
@@ -75,13 +75,13 @@ class HubbleFragment() : Fragment() {
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
         webView.addJavascriptInterface(
-            WebAppInterface(this),
-            "AndroidHost"
+                WebAppInterface(this),
+                "AndroidHost"
         )
         webView.webViewClient = HubbleWebViewClient(baseUrl, this)
 
         val url =
-            "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$token&wrap-plt=an"
+                "https://$baseUrl/classic?clientId=$clientId&clientSecret=$clientSecret&token=$token&wrap-plt=an"
         webView.loadUrl(url)
 
         return webView
@@ -92,8 +92,8 @@ class HubbleFragment() : Fragment() {
         progressBar = ProgressBar(context)
         progressBar.id = View.generateViewId()
         val progressBarParams = RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
         )
         progressBar.layoutParams = progressBarParams
     }
@@ -102,20 +102,20 @@ class HubbleFragment() : Fragment() {
         val constraintSet = ConstraintSet()
         constraintSet.clone(constraintLayout);
         constraintSet.connect(
-            progressBar.getId(), ConstraintSet.LEFT,
-            ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0
+                progressBar.getId(), ConstraintSet.LEFT,
+                ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0
         );
         constraintSet.connect(
-            progressBar.getId(), ConstraintSet.RIGHT,
-            ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0
+                progressBar.getId(), ConstraintSet.RIGHT,
+                ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0
         );
         constraintSet.connect(
-            progressBar.getId(), ConstraintSet.TOP,
-            ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0
+                progressBar.getId(), ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0
         );
         constraintSet.connect(
-            progressBar.getId(), ConstraintSet.BOTTOM,
-            ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0
+                progressBar.getId(), ConstraintSet.BOTTOM,
+                ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0
         );
         constraintSet.applyTo(constraintLayout);
     }
