@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import money.myhubble.storesdk.Hubble
+import money.myhubble.storesdk.HubblePage
 
 
 class MainActivity : AppCompatActivity() {
@@ -44,9 +45,9 @@ class MainActivity : AppCompatActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    HubbleFragmentButton()
+                    hubbleFragmentButton()
                     Spacer(modifier = Modifier.height(16.dp)) // Add some space between the buttons
-                    HubbleActivityButton()
+                    hubbleActivityButton()
                 }
 
             }
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun HubbleFragmentButton() {
+    fun hubbleFragmentButton() {
         val context = LocalContext.current
         Box(
         ) {
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun HubbleActivityButton() {
+    fun hubbleActivityButton() {
         val context = LocalContext.current
         Box(
         ) {
@@ -89,7 +90,10 @@ class MainActivity : AppCompatActivity() {
                                 token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
                                 onAnalyticsEvent = { eventName: String, props: Map<String, Any> ->
                                     Log.i("main-activity", "received event $eventName from Hubble ${props}")
-                                }
+                                },
+                                // page = HubblePage("transactions" ) // for opening a specific page
+
+
                         )
                         Hubble.open(context)
                     },

@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import money.myhubble.storesdk.Hubble
 import money.myhubble.storesdk.HubbleFragment
+import money.myhubble.storesdk.HubblePage
 
 
 class FragmentTestActivity : AppCompatActivity() {
@@ -17,6 +18,7 @@ class FragmentTestActivity : AppCompatActivity() {
                 clientId = "visit-health",
                 clientSecret = "sCOZ07mzht",
                 token = "JtKogLnhk0huM2wHMbr288d7iok_xrKwkv9N5PqwbE9D5HzAMrPr9WyUj6DJ0r_L4AeF0DIXZshTXr0PLNdOJ6IcTeiR49AhP5eb5ximvQ8",
+                // page = HubblePage("brand", mapOf("brandId" to "uber"))
         )
     }
 
