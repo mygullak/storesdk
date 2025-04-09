@@ -1,3 +1,41 @@
-/build
-.gradle/
+# IDE files
 .idea/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration
+local.properties
+
+# macOS files
+.DS_Store
+
+# Gradle Wrapper (optional, but often ignored)
+gradlew
+gradlew.bat
+gradle/
+
+# Build cache
+.buildconfig/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.jar
+*.lock
+
+# Keystore files
+*.jks
+*.keystore
+
+# C/C++ intermediates
+.cxx/
+
+# Lint results
+lint-results-*.xml
+lint-results-*.html
+
+# Other generated files
+captures/ 
