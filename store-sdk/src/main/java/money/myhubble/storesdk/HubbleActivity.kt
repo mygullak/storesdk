@@ -1,7 +1,6 @@
 package money.myhubble.storesdk
 
 import android.R
-import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -14,11 +13,13 @@ class HubbleActivity : AppCompatActivity() {
 
     private lateinit var hubbleFragment: HubbleFragment
     private var hubbleFragmentTag = "hubble-webview-fragment"
+    private var defaultStatusBarColor = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         val window = window
+        defaultStatusBarColor = window.statusBarColor
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
@@ -50,6 +51,7 @@ class HubbleActivity : AppCompatActivity() {
         super.onStop()
         val window = window
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        window.statusBarColor = defaultStatusBarColor;
         windowInsetsController.isAppearanceLightStatusBars = false
     }
 }
