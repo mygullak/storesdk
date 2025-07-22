@@ -25,7 +25,9 @@ class HubbleActivity : AppCompatActivity() {
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.isAppearanceLightStatusBars = true
 
-        hubbleFragment = Hubble.getFragment()
+        hubbleFragment = HubbleFragment().apply {
+            arguments = intent.extras
+        }
 
         supportFragmentManager.beginTransaction()
                 .replace(
