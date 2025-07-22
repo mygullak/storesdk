@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                                 onAnalyticsEvent = { eventName: String, props: Map<String, Any> ->
                                     Log.i("main-activity", "received event $eventName from Hubble ${props}")
                                 },
-                                // page = HubblePage("transactions" ) // for opening a specific page
+//                                 page = HubblePage("transactions" ) // for opening a specific page
 
 
                         )
