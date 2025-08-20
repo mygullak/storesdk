@@ -81,6 +81,7 @@ class HubbleFragment : Fragment() {
             settings.databaseEnabled = true
             settings.domStorageEnabled = true
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            settings.textZoom = 100
         }
         webView.addJavascriptInterface(
             WebAppInterface(this),
