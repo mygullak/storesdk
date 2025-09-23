@@ -13,6 +13,8 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 
 class HubbleFragment : Fragment() {
@@ -23,6 +25,7 @@ class HubbleFragment : Fragment() {
     lateinit var webView: WebView
     private var page: HubblePage? = null
     private lateinit var progressBar: ProgressBar
+    private lateinit var constraintLayout: ConstraintLayout
 
     val baseUrl: String
         get() =
@@ -47,13 +50,21 @@ class HubbleFragment : Fragment() {
         }
         val context = requireContext()
 
-        val constraintLayout = ConstraintLayout(context)
+        constraintLayout = ConstraintLayout(context)
         constraintLayout.setBackgroundColor(Color.WHITE)
         constraintLayout.layoutParams =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
+        
+        // Handle window insets to avoid status bar overlap
+        ViewCompat.setOnApplyWindowInsetsListener(constraintLayout) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
         setupProgressBar(context)
         constraintLayout.addView(progressBar)
         setupConstraints(constraintLayout)
