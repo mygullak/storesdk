@@ -2,6 +2,7 @@ package money.myhubble.storesdk
 
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -11,32 +12,51 @@ import org.json.JSONObject
 
 
 class HubbleWebViewClient(
-        private val baseUrl: String,
-        private val fragment: HubbleFragment,
+    private val baseUrl: String,
+    private val fragment: HubbleFragment,
 ) : WebViewClient() {
-
+    
     override fun onPageFinished(view: WebView?, url: String?) {
         fragment.showWebView()
     }
-
+    
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        val url = request?.url
-        url?.let {
-            if (url.toString().startsWith(baseUrl)
-            ) {
-                return false
+        val url = request?.url?.toString()
+        
+        // Allow navigation within Hubble baseUrl
+        if (url?.contains(baseUrl) == true) {
+            return false
+        }
+        
+        // Handle external URLs
+        return try {
+            val intent = Intent(Intent.ACTION_VIEW, request?.url)
+            val context = view?.context
+            
+            if (context != null) {
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                    true
+                } else {
+                    // No app available to handle this URL
+                    Toast.makeText(
+                        context,
+                        "No app available to handle this request",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    true
+                }
+            } else {
+                Log.e(Hubble.LOG_TAG, "Context is null, cannot open external URL")
+                false
             }
+        } catch (e: Exception) {
+            Log.e(Hubble.LOG_TAG, "Error opening URL: ${url}", e)
+            true
         }
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, url)
-            fragment.context?.startActivity(intent)
-        } catch (err: Exception) {
-            return false;
-        }
-        return true
     }
-
 }
+
 
 class WebAppInterface(
         val fragment: HubbleFragment
