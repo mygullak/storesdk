@@ -82,6 +82,15 @@ class HubbleFragment : Fragment() {
             settings.domStorageEnabled = true
             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             settings.textZoom = 100
+            // Disable zoom controls and set proper viewport
+            settings.builtInZoomControls = false
+            settings.displayZoomControls = false
+            settings.setSupportZoom(false)
+            // Use WIDE viewport to prevent auto-zoom on input focus
+            settings.useWideViewPort = true
+            settings.loadWithOverviewMode = true
+            // Set initial scale to prevent zoom
+            settings.setInitialScale(100)
         }
         webView.addJavascriptInterface(
             WebAppInterface(this),
